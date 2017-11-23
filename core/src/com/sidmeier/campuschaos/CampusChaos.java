@@ -85,10 +85,10 @@ public class CampusChaos extends ApplicationAdapter {
         float x = Gdx.input.getX();
         float y = Gdx.input.getY();
 
-        float leftEdge = ((Constants.APP_WIDTH / 100) * edgePercent);
-        float rightEdge = Constants.APP_WIDTH - leftEdge;
-        float bottomEdge = ((Constants.APP_HEIGHT / 100) * edgePercent);
-        float topEdge = Constants.APP_HEIGHT - bottomEdge;
+        float leftEdge = ((cam.viewportWidth / 100) * edgePercent);
+        float rightEdge = cam.viewportWidth - leftEdge;
+        float bottomEdge = ((cam.viewportHeight / 100) * edgePercent);
+        float topEdge = cam.viewportHeight - bottomEdge;
 
         if (x <= leftEdge) {
             cam.translate(-camSpeed, 0, 0);
@@ -103,7 +103,7 @@ public class CampusChaos extends ApplicationAdapter {
         }
 
         // Edge clamping
-        cam.zoom = MathUtils.clamp(cam.zoom, 0.1f, Constants.WORLD_HEIGHT/cam.viewportWidth);
+        cam.zoom = MathUtils.clamp(cam.zoom, 0.1f, Constants.WORLD_HEIGHT/cam.viewportHeight);
 
         float effectiveViewportWidth = cam.viewportWidth * cam.zoom;
         float effectiveViewportHeight = cam.viewportHeight * cam.zoom;

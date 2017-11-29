@@ -27,7 +27,7 @@ public class CampusChaos extends ApplicationAdapter {
 	@Override
 	public void create () {
         batch = new SpriteBatch();
-        mapSprite = new Sprite(new Texture(Gdx.files.internal("map_placeholder.jpg")));
+        mapSprite = new Sprite(new Texture(Gdx.files.internal("core/assets/tiledtest.png")));
         mapSprite.setPosition(0, 0);
         mapSprite.setSize(Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT);
 

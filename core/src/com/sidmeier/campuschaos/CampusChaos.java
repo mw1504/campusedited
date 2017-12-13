@@ -8,6 +8,14 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.HexagonalTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -18,18 +26,16 @@ public class CampusChaos extends ApplicationAdapter {
     private Viewport viewport;
     private OrthographicCamera cam;
 
-    private SpriteBatch batch;
-    private Sprite mapSprite;
+    private TiledMap map;
+    private OrthogonalTiledMapRenderer renderer;
 
     /**
-     * Defines mapSprite, camera and viewport
+     * Defines map, renderer, camera and viewport
      */
 	@Override
 	public void create () {
-        batch = new SpriteBatch();
-        mapSprite = new Sprite(new Texture(Gdx.files.internal("core/assets/tiledtest.png")));
-        mapSprite.setPosition(0, 0);
-        mapSprite.setSize(Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT);
+	    map = new TmxMapLoader().load("core/assets/SEPRMapSquare.tmx");
+	    renderer = new OrthogonalTiledMapRenderer(map);
 
         cam = new OrthographicCamera();
         viewport = new ScreenViewport(cam);
@@ -39,20 +45,18 @@ public class CampusChaos extends ApplicationAdapter {
 	}
 
     /**
-     * Updates camera position, clears screen and draws mapSprite
+     * Updates camera position, clears screen and uses renderer to draw map
      */
 	@Override
 	public void render () {
         handleInput();
         cam.update();
 
-        Gdx.gl.glClearColor(1, 0, 0, 1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        batch.setProjectionMatrix(cam.combined);
-        batch.begin();
-        mapSprite.draw(batch);
-        batch.end();
+        renderer.setView(cam);
+        renderer.render();
 	}
 
     /**
@@ -103,13 +107,17 @@ public class CampusChaos extends ApplicationAdapter {
         }
 
         // Edge clamping
-        cam.zoom = MathUtils.clamp(cam.zoom, 0.1f, Constants.WORLD_HEIGHT/cam.viewportHeight);
+        TiledMapTileLayer mainLayer = (TiledMapTileLayer)map.getLayers().get(0);
+        float totalMapWidth = mainLayer.getWidth() * mainLayer.getTileWidth();
+        float totalMapHeight = mainLayer.getHeight() * mainLayer.getTileHeight();
+
+        cam.zoom = MathUtils.clamp(cam.zoom, 0.1f, totalMapHeight/cam.viewportHeight);
 
         float effectiveViewportWidth = cam.viewportWidth * cam.zoom;
         float effectiveViewportHeight = cam.viewportHeight * cam.zoom;
 
-        cam.position.x = MathUtils.clamp(cam.position.x, effectiveViewportWidth / 2f, (Constants.WORLD_WIDTH - effectiveViewportWidth / 2f) - 1);
-        cam.position.y = MathUtils.clamp(cam.position.y, effectiveViewportHeight / 2f, (Constants.WORLD_HEIGHT - effectiveViewportHeight / 2f) - 1);
+        cam.position.x = MathUtils.clamp(cam.position.x, effectiveViewportWidth / 2f, (totalMapWidth - effectiveViewportWidth / 2f) - 1);
+        cam.position.y = MathUtils.clamp(cam.position.y, effectiveViewportHeight / 2f, (totalMapHeight - effectiveViewportHeight / 2f) - 1);
 
     }
 
@@ -127,6 +135,7 @@ public class CampusChaos extends ApplicationAdapter {
      */
     @Override
 	public void dispose () {
-	    mapSprite.getTexture().dispose();
+        map.dispose();
+        renderer.dispose();
 	}
 }

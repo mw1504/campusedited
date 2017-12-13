@@ -103,7 +103,10 @@ public class CampusChaos extends ApplicationAdapter {
         float totalMapWidth = mainLayer.getWidth() * mainLayer.getTileWidth();
         float totalMapHeight = mainLayer.getHeight() * mainLayer.getTileHeight();
 
-        cam.zoom = MathUtils.clamp(cam.zoom, 0.1f, totalMapHeight/cam.viewportHeight);
+        float displayedMH = totalMapHeight/cam.viewportHeight;
+        float displayedMW = totalMapWidth/cam.viewportWidth;
+
+        cam.zoom = MathUtils.clamp(cam.zoom, 0.1f, (displayedMH<displayedMW?displayedMH:displayedMW));
 
         float effectiveViewportWidth = cam.viewportWidth * cam.zoom;
         float effectiveViewportHeight = cam.viewportHeight * cam.zoom;

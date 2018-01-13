@@ -5,13 +5,17 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.sidmeier.campuschaos.utils.Constants;
 
 public class CampusChaos extends ApplicationAdapter {
 
@@ -49,6 +53,7 @@ public class CampusChaos extends ApplicationAdapter {
 
         renderer.setView(cam);
         renderer.render();
+        hoverSelectTile();
 	}
 
     /**
@@ -113,6 +118,38 @@ public class CampusChaos extends ApplicationAdapter {
 
         cam.position.x = MathUtils.clamp(cam.position.x, effectiveViewportWidth / 2f, (totalMapWidth - effectiveViewportWidth / 2f) - 1);
         cam.position.y = MathUtils.clamp(cam.position.y, effectiveViewportHeight / 2f, (totalMapHeight - effectiveViewportHeight / 2f) - 1);
+
+    }
+
+    /**
+     * Highlights tile that user is hovering over with the mouse
+     */
+    public void hoverSelectTile(){
+        MapProperties prop = map.getProperties();
+
+        float mouseX = Gdx.input.getX();
+        float mouseY = -Gdx.input.getY() + (Constants.APP_HEIGHT);
+
+        float camX = (cam.position.x - ((cam.viewportWidth/2) * cam.zoom)) * 1/cam.zoom;
+        float camY = (cam.position.y - ((cam.viewportHeight/2) * cam.zoom)) * 1/cam.zoom;
+
+        float tileWidth = prop.get("tilewidth", Integer.class) * 1/cam.zoom;
+        float tileHeight = prop.get("tileheight", Integer.class) * 1/cam.zoom;
+
+        float tileX = (mouseX + camX)/tileWidth;
+        float tileY = (mouseY + camY)/tileHeight;
+
+        float selectX = ((tileX - (tileX % 1)) * tileWidth) - camX;
+        float selectY = ((tileY - (tileY % 1)) * tileWidth) - camY;
+
+        //System.out.println(Math.floor(camX) + ", " + Math.floor(camY));
+        //System.out.println((tileX - (tileX % 1)) + ", " + (tileY - (tileY % 1)));
+
+        ShapeRenderer shapeRenderer = new ShapeRenderer();
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(1, 0, 0, 1);
+        shapeRenderer.rect(selectX, selectY, tileWidth, tileHeight);
+        shapeRenderer.end();
 
     }
 

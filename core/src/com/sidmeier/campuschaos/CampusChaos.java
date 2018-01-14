@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -128,7 +127,7 @@ public class CampusChaos extends ApplicationAdapter {
         MapProperties prop = map.getProperties();
 
         float mouseX = Gdx.input.getX();
-        float mouseY = -Gdx.input.getY() + (Constants.APP_HEIGHT);
+        float mouseY = -Gdx.input.getY() + (cam.viewportHeight);
 
         float camX = (cam.position.x - ((cam.viewportWidth/2) * cam.zoom)) * 1/cam.zoom;
         float camY = (cam.position.y - ((cam.viewportHeight/2) * cam.zoom)) * 1/cam.zoom;
@@ -145,9 +144,14 @@ public class CampusChaos extends ApplicationAdapter {
         //System.out.println(Math.floor(camX) + ", " + Math.floor(camY));
         //System.out.println((tileX - (tileX % 1)) + ", " + (tileY - (tileY % 1)));
 
+        Gdx.gl.glEnable(GL20.GL_BLEND);
         ShapeRenderer shapeRenderer = new ShapeRenderer();
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(1, 0, 0, 1);
+        shapeRenderer.rect(selectX, selectY, tileWidth, tileHeight);
+        shapeRenderer.end();
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(1, 0, 0, 0.5f);
         shapeRenderer.rect(selectX, selectY, tileWidth, tileHeight);
         shapeRenderer.end();
 

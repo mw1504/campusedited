@@ -123,17 +123,17 @@ public class CampusChaos extends ApplicationAdapter {
     /**
      * Highlights tile that user is hovering over with the mouse
      */
-    public void hoverSelectTile(){
-        MapProperties prop = map.getProperties();
+    private void hoverSelectTile(){
+        TiledMapTileLayer mainLayer = (TiledMapTileLayer)map.getLayers().get(0);
 
         float mouseX = Gdx.input.getX();
         float mouseY = -Gdx.input.getY() + (cam.viewportHeight);
 
-        float camX = (cam.position.x - ((cam.viewportWidth/2) * cam.zoom)) * 1/cam.zoom;
-        float camY = (cam.position.y - ((cam.viewportHeight/2) * cam.zoom)) * 1/cam.zoom;
+        float camX = (cam.position.x - ((cam.viewportWidth/2) * cam.zoom)) * (1/cam.zoom);
+        float camY = (cam.position.y - ((cam.viewportHeight/2) * cam.zoom)) * (1/cam.zoom);
 
-        float tileWidth = prop.get("tilewidth", Integer.class) * 1/cam.zoom;
-        float tileHeight = prop.get("tileheight", Integer.class) * 1/cam.zoom;
+        float tileWidth = mainLayer.getTileWidth() * (1/cam.zoom);
+        float tileHeight = mainLayer.getTileHeight() * (1/cam.zoom);
 
         float tileX = (mouseX + camX)/tileWidth;
         float tileY = (mouseY + camY)/tileHeight;

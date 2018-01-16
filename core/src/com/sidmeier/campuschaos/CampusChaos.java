@@ -6,7 +6,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -15,13 +14,14 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.sidmeier.campuschaos.utils.Constants;
+import javafx.util.Pair;
 
 public class CampusChaos extends ApplicationAdapter {
 
     private Viewport viewport;
     private OrthographicCamera cam;
 
-    private TiledMap map;
+    private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer renderer;
 
     /**
@@ -29,8 +29,9 @@ public class CampusChaos extends ApplicationAdapter {
      */
 	@Override
 	public void create () {
-	    map = new TmxMapLoader().load("core/assets/SEPRMapSquare.tmx");
-	    renderer = new OrthogonalTiledMapRenderer(map);
+	    initMap();
+	    tiledMap = new TmxMapLoader().load("core/assets/SEPRMapSquare.tmx");
+	    renderer = new OrthogonalTiledMapRenderer(tiledMap);
 
         cam = new OrthographicCamera();
         viewport = new ScreenViewport(cam);
@@ -54,6 +55,20 @@ public class CampusChaos extends ApplicationAdapter {
         renderer.render();
         hoverSelectTile();
 	}
+
+	// TODO Import sectors and locations from file
+    private void initMap() {
+	    Map map = new Map();
+        Sector ronCookeHub = new Sector("Ron Cooke Hub");
+        Sector hesHall = new Sector("Heslington Hall");
+        Sector centralHall = new Sector("Central Hall");
+        Pair<Integer, Integer> ronCookeHubCoord = new Pair<Integer, Integer>(19,8);
+        Pair<Integer, Integer> hesHallCoord = new Pair<Integer, Integer>(9,7);
+        Pair<Integer, Integer> centralHallCoord = new Pair<Integer, Integer>(5,8);
+        map.addSector(ronCookeHub, ronCookeHubCoord);
+        map.addSector(hesHall, hesHallCoord);
+        map.addSector(centralHall, centralHallCoord);
+    }
 
     /**
      * Handles user input to move camera, ensures camera doesn't leave world
@@ -103,7 +118,7 @@ public class CampusChaos extends ApplicationAdapter {
         }
 
         // Edge clamping
-        TiledMapTileLayer mainLayer = (TiledMapTileLayer)map.getLayers().get(0);
+        TiledMapTileLayer mainLayer = (TiledMapTileLayer)tiledMap.getLayers().get(0);
         float totalMapWidth = mainLayer.getWidth() * mainLayer.getTileWidth();
         float totalMapHeight = mainLayer.getHeight() * mainLayer.getTileHeight();
 
@@ -124,7 +139,7 @@ public class CampusChaos extends ApplicationAdapter {
      * Highlights tile that user is hovering over with the mouse
      */
     private void hoverSelectTile(){
-        TiledMapTileLayer mainLayer = (TiledMapTileLayer)map.getLayers().get(0);
+        TiledMapTileLayer mainLayer = (TiledMapTileLayer)tiledMap.getLayers().get(0);
 
         float mouseX = Gdx.input.getX();
         float mouseY = -Gdx.input.getY() + (cam.viewportHeight);
@@ -141,7 +156,7 @@ public class CampusChaos extends ApplicationAdapter {
         float selectX = ((tileX - (tileX % 1)) * tileWidth) - camX;
         float selectY = ((tileY - (tileY % 1)) * tileWidth) - camY;
 
-        //System.out.println(Math.floor(camX) + ", " + Math.floor(camY));
+        System.out.println(Math.floor(tileX) + ", " + Math.floor(tileY));
         //System.out.println((tileX - (tileX % 1)) + ", " + (tileY - (tileY % 1)));
 
         Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -171,7 +186,7 @@ public class CampusChaos extends ApplicationAdapter {
      */
     @Override
 	public void dispose () {
-        map.dispose();
+        tiledMap.dispose();
         renderer.dispose();
 	}
 }

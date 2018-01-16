@@ -14,12 +14,18 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.sidmeier.campuschaos.utils.Constants;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import javafx.util.Pair;
 
 public class CampusChaos extends ApplicationAdapter {
 
     private Viewport viewport;
     private OrthographicCamera cam;
+
+    private SpriteBatch batch;
+    private BitmapFont font;
 
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer renderer;
@@ -31,7 +37,14 @@ public class CampusChaos extends ApplicationAdapter {
      */
 	@Override
 	public void create () {
+<<<<<<< Updated upstream
 	    map = initMap();
+=======
+        batch = new SpriteBatch();
+        font = new BitmapFont();
+        font.setColor(Color.WHITE);
+	    initMap();
+>>>>>>> Stashed changes
 	    tiledMap = new TmxMapLoader().load("core/assets/SEPRMapSquare.tmx");
 	    renderer = new OrthogonalTiledMapRenderer(tiledMap);
 
@@ -56,6 +69,9 @@ public class CampusChaos extends ApplicationAdapter {
         renderer.setView(cam);
         renderer.render();
         hoverSelectTile();
+        batch.begin();
+        font.draw(batch,"Hello World Can You See Me?????",20,20);
+        batch.end();
 	}
 
 	// TODO Import sectors and locations from file

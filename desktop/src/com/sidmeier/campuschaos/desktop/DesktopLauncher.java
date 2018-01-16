@@ -11,6 +11,7 @@ public class DesktopLauncher {
 		config.title = "Campus Chaos";
 		config.width = Constants.APP_WIDTH;
 		config.height = Constants.APP_HEIGHT;
+		config.fullscreen = true;
 		new LwjglApplication(new CampusChaos(), config);
 	}
 }

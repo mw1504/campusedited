@@ -15,6 +15,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.sidmeier.campuschaos.utils.Constants;
 import javafx.util.Pair;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 public class CampusChaos extends ApplicationAdapter {
 
@@ -61,6 +64,29 @@ public class CampusChaos extends ApplicationAdapter {
 	// TODO Import sectors and locations from file
     public Map initMap() {
 	    Map map = new Map();
+
+	    /*File sectorsFile = new File("core/assets/sectors.txt");
+	    String name;
+	    int x, y;
+
+	    try {
+            Scanner inputStream = new Scanner(sectorsFile);
+            inputStream.useDelimiter(", ");
+
+            while(inputStream.hasNext()) {
+                name = inputStream.next();
+                x = Integer.parseInt(inputStream.next());
+                y = Integer.parseInt(inputStream.next());
+
+
+            }
+            inputStream.close();
+        }
+        catch (FileNotFoundException e) {
+	        e.printStackTrace();
+        }*/
+
+
         Sector ronCookeHub = new Sector("Ron Cooke Hub");
         Sector hesHall = new Sector("Heslington Hall");
         Sector centralHall = new Sector("Central Hall");

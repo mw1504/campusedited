@@ -24,12 +24,14 @@ public class CampusChaos extends ApplicationAdapter {
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer renderer;
 
+    private Map map;
+
     /**
      * Defines map, renderer, camera and viewport
      */
 	@Override
 	public void create () {
-	    initMap();
+	    map = initMap();
 	    tiledMap = new TmxMapLoader().load("core/assets/SEPRMapSquare.tmx");
 	    renderer = new OrthogonalTiledMapRenderer(tiledMap);
 
@@ -57,7 +59,7 @@ public class CampusChaos extends ApplicationAdapter {
 	}
 
 	// TODO Import sectors and locations from file
-    private void initMap() {
+    public Map initMap() {
 	    Map map = new Map();
         Sector ronCookeHub = new Sector("Ron Cooke Hub");
         Sector hesHall = new Sector("Heslington Hall");
@@ -65,9 +67,10 @@ public class CampusChaos extends ApplicationAdapter {
         Pair<Integer, Integer> ronCookeHubCoord = new Pair<Integer, Integer>(19,8);
         Pair<Integer, Integer> hesHallCoord = new Pair<Integer, Integer>(9,7);
         Pair<Integer, Integer> centralHallCoord = new Pair<Integer, Integer>(5,8);
-        map.addSector(ronCookeHub, ronCookeHubCoord);
-        map.addSector(hesHall, hesHallCoord);
-        map.addSector(centralHall, centralHallCoord);
+        map.addSector(ronCookeHubCoord, ronCookeHub);
+        map.addSector(hesHallCoord, hesHall);
+        map.addSector(centralHallCoord, centralHall);
+        return map;
     }
 
     /**
@@ -153,10 +156,13 @@ public class CampusChaos extends ApplicationAdapter {
         float tileX = (mouseX + camX)/tileWidth;
         float tileY = (mouseY + camY)/tileHeight;
 
-        float selectX = ((tileX - (tileX % 1)) * tileWidth) - camX;
-        float selectY = ((tileY - (tileY % 1)) * tileWidth) - camY;
+        int roundX = (int) tileX;
+        int roundY = (int) tileY;
 
-        System.out.println(Math.floor(tileX) + ", " + Math.floor(tileY));
+        float selectX = (roundX * tileWidth) - camX;
+        float selectY = (roundY * tileWidth) - camY;
+
+        //System.out.println(roundX + ", " + roundY);
         //System.out.println((tileX - (tileX % 1)) + ", " + (tileY - (tileY % 1)));
 
         Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -169,6 +175,11 @@ public class CampusChaos extends ApplicationAdapter {
         shapeRenderer.setColor(1, 0, 0, 0.5f);
         shapeRenderer.rect(selectX, selectY, tileWidth, tileHeight);
         shapeRenderer.end();
+
+        Pair<Integer, Integer> coord = new Pair<Integer, Integer>(roundX, roundY);
+        if(map.sectorAtCoord(coord)) {
+            System.out.println(map.getSector(coord).name);
+        }
 
     }
 

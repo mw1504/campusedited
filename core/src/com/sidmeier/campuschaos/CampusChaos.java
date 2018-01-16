@@ -43,11 +43,14 @@ public class CampusChaos extends ApplicationAdapter {
 	@Override
 	public void create () {
 	    map = initMap();
+
+        // TODO Switch to freetype to avoid scaling issues
         batch = new SpriteBatch();
         font = new BitmapFont();
         font.setColor(Color.WHITE);
+        font.getData().setScale(2);
         shapeRenderer = new ShapeRenderer();
-	    initMap();
+
 	    tiledMap = new TmxMapLoader().load("core/assets/SEPRMapSquare.tmx");
 	    renderer = new OrthogonalTiledMapRenderer(tiledMap);
 
@@ -56,6 +59,7 @@ public class CampusChaos extends ApplicationAdapter {
         viewport.apply();
 
         cam.position.set(cam.viewportWidth/2,cam.viewportHeight/2,0);
+        cam.zoom = 1.65f;
 
 
 	}
@@ -74,10 +78,19 @@ public class CampusChaos extends ApplicationAdapter {
 
         renderer.setView(cam);
         renderer.render();
-        hoverSelectTile();
-        batch.begin();
-        font.draw(batch,"Hello World Can You See Me?????",20,(cam.viewportHeight - 20));
-        batch.end();
+
+
+        Pair<Integer, Integer> coord = hoverSelectTile();
+        String sectorName = null;
+        if(map.sectorAtCoord(coord)) {
+            sectorName = map.getSector(coord).name;
+        }
+        if(sectorName != null){
+            batch.begin();
+            font.draw(batch,sectorName,20,(cam.viewportHeight - 20));
+            batch.end();
+        }
+
 
         shapeRenderer.begin(ShapeType.Filled);
         shapeRenderer.setColor(0, 0, 0, 128);
@@ -92,6 +105,7 @@ public class CampusChaos extends ApplicationAdapter {
 	    /*File sectorsFile = new File("core/assets/sectors.txt");
 	    String name;
 	    int x, y;
+	    int classID = 0;
 
 	    try {
             Scanner inputStream = new Scanner(sectorsFile);
@@ -127,7 +141,7 @@ public class CampusChaos extends ApplicationAdapter {
      * Handles user input to move camera, ensures camera doesn't leave world
      */
     private void handleInput() {
-        float camSpeed = 3;    // Camera speed in units per frame
+        /*float camSpeed = 3;    // Camera speed in units per frame
 
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             cam.zoom += 0.02;
@@ -146,9 +160,6 @@ public class CampusChaos extends ApplicationAdapter {
         }
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             cam.translate(0, camSpeed, 0);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-            Gdx.app.exit();
         }
 
         // Edge scrolling
@@ -171,17 +182,23 @@ public class CampusChaos extends ApplicationAdapter {
             cam.translate(0, camSpeed, 0);
         } else if (y >= topEdge) {
             cam.translate(0, -camSpeed, 0);
+        }*/
+
+        // Escape to exit
+        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+            Gdx.app.exit();
         }
 
         // Edge clamping
         TiledMapTileLayer mainLayer = (TiledMapTileLayer)tiledMap.getLayers().get(0);
         float totalMapWidth = mainLayer.getWidth() * mainLayer.getTileWidth();
-        float totalMapHeight = mainLayer.getHeight() * mainLayer.getTileHeight();
+        float totalMapHeight = (mainLayer.getHeight() * mainLayer.getTileHeight()) - 128;
 
         float displayedMH = totalMapHeight/cam.viewportHeight;
         float displayedMW = totalMapWidth/cam.viewportWidth;
 
-        cam.zoom = MathUtils.clamp(cam.zoom, 2f, (displayedMH<displayedMW?displayedMH:displayedMW));
+        // TODO Limit zoom
+        cam.zoom = MathUtils.clamp(cam.zoom, 0.1f, (displayedMH<displayedMW?displayedMH:displayedMW));
 
         float effectiveViewportWidth = cam.viewportWidth * cam.zoom;
         float effectiveViewportHeight = cam.viewportHeight * cam.zoom;
@@ -194,7 +211,7 @@ public class CampusChaos extends ApplicationAdapter {
     /**
      * Highlights tile that user is hovering over with the mouse
      */
-    private void hoverSelectTile(){
+    private Pair<Integer, Integer> hoverSelectTile(){
         TiledMapTileLayer mainLayer = (TiledMapTileLayer)tiledMap.getLayers().get(0);
 
         float mouseX = Gdx.input.getX();
@@ -230,11 +247,10 @@ public class CampusChaos extends ApplicationAdapter {
         shapeRenderer.end();
 
         Pair<Integer, Integer> coord = new Pair<Integer, Integer>(roundX, roundY);
-        if(map.sectorAtCoord(coord)) {
-            System.out.println(map.getSector(coord).name);
-        }
+        return coord;
 
     }
+
 
     /**
      * Handles camera update on resizing of game window

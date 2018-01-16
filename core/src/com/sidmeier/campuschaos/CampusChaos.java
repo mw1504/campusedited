@@ -14,6 +14,10 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.sidmeier.campuschaos.utils.Constants;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.*;
 import javafx.util.Pair;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,8 +28,12 @@ public class CampusChaos extends ApplicationAdapter {
     private Viewport viewport;
     private OrthographicCamera cam;
 
+    private SpriteBatch batch;
+    private BitmapFont font;
+
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer renderer;
+    private ShapeRenderer shapeRenderer;
 
     private Map map;
 
@@ -35,6 +43,11 @@ public class CampusChaos extends ApplicationAdapter {
 	@Override
 	public void create () {
 	    map = initMap();
+        batch = new SpriteBatch();
+        font = new BitmapFont();
+        font.setColor(Color.WHITE);
+        shapeRenderer = new ShapeRenderer();
+	    initMap();
 	    tiledMap = new TmxMapLoader().load("core/assets/SEPRMapSquare.tmx");
 	    renderer = new OrthogonalTiledMapRenderer(tiledMap);
 
@@ -43,7 +56,10 @@ public class CampusChaos extends ApplicationAdapter {
         viewport.apply();
 
         cam.position.set(cam.viewportWidth/2,cam.viewportHeight/2,0);
+
+
 	}
+
 
     /**
      * Updates camera position, clears screen and uses renderer to draw map
@@ -59,6 +75,14 @@ public class CampusChaos extends ApplicationAdapter {
         renderer.setView(cam);
         renderer.render();
         hoverSelectTile();
+        batch.begin();
+        font.draw(batch,"Hello World Can You See Me?????",20,(cam.viewportHeight - 20));
+        batch.end();
+
+        shapeRenderer.begin(ShapeType.Filled);
+        shapeRenderer.setColor(0, 0, 0, 128);
+        shapeRenderer.rect(0, 0, 20, 20);
+        shapeRenderer.end();
 	}
 
 	// TODO Import sectors and locations from file
@@ -123,6 +147,9 @@ public class CampusChaos extends ApplicationAdapter {
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             cam.translate(0, camSpeed, 0);
         }
+        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+            Gdx.app.exit();
+        }
 
         // Edge scrolling
         float edgePercent = 5;  // Percentage of APP edge that will cause scrolling on mouseover
@@ -154,7 +181,7 @@ public class CampusChaos extends ApplicationAdapter {
         float displayedMH = totalMapHeight/cam.viewportHeight;
         float displayedMW = totalMapWidth/cam.viewportWidth;
 
-        cam.zoom = MathUtils.clamp(cam.zoom, 0.1f, (displayedMH<displayedMW?displayedMH:displayedMW));
+        cam.zoom = MathUtils.clamp(cam.zoom, 2f, (displayedMH<displayedMW?displayedMH:displayedMW));
 
         float effectiveViewportWidth = cam.viewportWidth * cam.zoom;
         float effectiveViewportHeight = cam.viewportHeight * cam.zoom;

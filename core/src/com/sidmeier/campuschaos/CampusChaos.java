@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -14,7 +15,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.sidmeier.campuschaos.utils.Constants;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.*;
@@ -44,11 +44,14 @@ public class CampusChaos extends ApplicationAdapter {
 	public void create () {
 	    map = initMap();
 
-        // TODO Switch to freetype to avoid scaling issues
         batch = new SpriteBatch();
-        font = new BitmapFont();
-        font.setColor(Color.WHITE);
-        font.getData().setScale(2);
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("core/assets/FreeMonoBold.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 48;
+        font = generator.generateFont(parameter);
+        generator.dispose();
+
+
         shapeRenderer = new ShapeRenderer();
 
 	    tiledMap = new TmxMapLoader().load("core/assets/SEPRMapSquare.tmx");
@@ -99,7 +102,7 @@ public class CampusChaos extends ApplicationAdapter {
 	}
 
 	// TODO Import sectors and locations from file
-    public Map initMap() {
+    private Map initMap() {
 	    Map map = new Map();
 
 	    /*File sectorsFile = new File("core/assets/sectors.txt");
@@ -246,8 +249,7 @@ public class CampusChaos extends ApplicationAdapter {
         shapeRenderer.rect(selectX, selectY, tileWidth, tileHeight);
         shapeRenderer.end();
 
-        Pair<Integer, Integer> coord = new Pair<Integer, Integer>(roundX, roundY);
-        return coord;
+        return new Pair<Integer, Integer>(roundX, roundY);
 
     }
 

@@ -96,7 +96,7 @@ public class CampusChaos extends ApplicationAdapter {
         Pair<Integer, Integer> coord = tileSelect();
         String sectorName = null;
         if(map.sectorAtCoord(coord)) {
-            sectorName = map.getSector(coord).name;
+            sectorName = map.getSector(coord).getName();
         }
         if(sectorName != null){
             batch.begin();

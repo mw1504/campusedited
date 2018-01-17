@@ -2,56 +2,52 @@ package com.sidmeier.campuschaos;
 
 import javafx.util.Pair;
 
-import java.io.FileNotFoundException;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 
 public class Map {
 
-    HashMap<Pair<Integer,Integer>,Sector> sectorLocations;
-    Pair<Integer, Integer> pvcLocation;
+    private HashMap<Pair<Integer,Integer>,Sector> sectorLocations;
+    private Pair<Integer, Integer> pvcLocation;
 
     public Map() {
         this.sectorLocations = new HashMap<Pair<Integer, Integer>, Sector>();
         this.pvcLocation = new Pair<Integer, Integer>(null, null);
 
-        Sector ronCookeHub = new Sector("Ron Cooke Hub");
-        Sector hesHall = new Sector("Heslington Hall");
-        Sector centralHall = new Sector("Central Hall");
-        Pair<Integer, Integer> ronCookeHubCoord = new Pair<Integer, Integer>(19,8);
-        Pair<Integer, Integer> hesHallCoord = new Pair<Integer, Integer>(9,7);
-        Pair<Integer, Integer> centralHallCoord = new Pair<Integer, Integer>(5,8);
-        this.addSector(ronCookeHubCoord, ronCookeHub);
-        this.addSector(hesHallCoord, hesHall);
-        this.addSector(centralHallCoord, centralHall);
-    }
-
-/*    File sectorsFile = new File("core/assets/sectors.txt");
-    String name;
-    int x, y;
-
-	    try {
-        Scanner inputStream = new Scanner(sectorsFile);
-        inputStream.useDelimiter(", ");
-
-        while(inputStream.hasNext()) {
-            name = inputStream.next();
-            x = Integer.parseInt(inputStream.next());
-            y = Integer.parseInt(inputStream.next());
-
-
+        BufferedReader myReader = null;
+        String file = "core/assets/Sectors.txt";
+        try {
+            this.readSectorsFromFile(myReader, file);
+        } catch (IOException e) {
+            if (myReader == null) {
+                System.out.println("File: Sectors.txt not found");
+            } else {
+                System.out.println(e.getMessage());
+            }
         }
-        inputStream.close();
     }
-        catch (FileNotFoundException e) {
-        e.printStackTrace();
-    }*/
 
-    public HashMap<Pair<Integer, Integer>, Sector> getSectorMap() {
-        return sectorLocations;
+    private void readSectorsFromFile(BufferedReader myReader, String file) throws IOException {
+        myReader = new BufferedReader(new FileReader(file));
+        String lineRead;
+        while ((lineRead = myReader.readLine()) != null) {
+            String[] sectorParts = lineRead.split(", ");
+            if (sectorParts.length > 3) {
+                throw new IOException("File is corrupted.");
+            }
+            System.out.println(sectorParts[0] + ", " + sectorParts[1] + ", " + sectorParts[2]);
+            this.addSector(new Pair<Integer,Integer>(Integer.parseInt(sectorParts[1]),Integer.parseInt(sectorParts[2])), new Sector(sectorParts[0]));
+        }
+    }
+
+    public HashMap<Pair<Integer, Integer>, Sector> getSectorLocations() {
+        return this.sectorLocations;
     }
 
     public Pair<Integer, Integer> getPvcLocation() {
-        return pvcLocation;
+        return this.pvcLocation;
     }
 
     public void setPvcLocation(Pair<Integer, Integer> pvcLocation) {

@@ -11,6 +11,16 @@ public class Map {
     public Map() {
         this.sectorLocations = new HashMap<Pair<Integer, Integer>, Sector>();
         this.pvcLocation = new Pair<Integer, Integer>(null, null);
+
+        Sector ronCookeHub = new Sector("Ron Cooke Hub");
+        Sector hesHall = new Sector("Heslington Hall");
+        Sector centralHall = new Sector("Central Hall");
+        Pair<Integer, Integer> ronCookeHubCoord = new Pair<Integer, Integer>(19,8);
+        Pair<Integer, Integer> hesHallCoord = new Pair<Integer, Integer>(9,7);
+        Pair<Integer, Integer> centralHallCoord = new Pair<Integer, Integer>(5,8);
+        this.addSector(ronCookeHubCoord, ronCookeHub);
+        this.addSector(hesHallCoord, hesHall);
+        this.addSector(centralHallCoord, centralHall);
     }
 
     public HashMap<Pair<Integer, Integer>, Sector> getSectorMap() {

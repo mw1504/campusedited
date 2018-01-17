@@ -42,17 +42,10 @@ public class CampusChaos extends ApplicationAdapter {
      */
 	@Override
 	public void create () {
-	    map = initMap();
+	    map = new Map();
 
         batch = new SpriteBatch();
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("core/assets/FreeMonoBold.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 48;
-        font = generator.generateFont(parameter);
-        generator.dispose();
-
-
-        shapeRenderer = new ShapeRenderer();
+        font = generateFont("core/assets/FreeMonoBold.ttf", 48);
 
 	    tiledMap = new TmxMapLoader().load("core/assets/SEPRMapSquare.tmx");
 	    renderer = new OrthogonalTiledMapRenderer(tiledMap);
@@ -64,8 +57,16 @@ public class CampusChaos extends ApplicationAdapter {
         cam.position.set(cam.viewportWidth/2,cam.viewportHeight/2,0);
         cam.zoom = 1.65f;
 
-
 	}
+
+	private BitmapFont generateFont(String fontPath, int size) {
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(fontPath));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = size;
+        BitmapFont font = generator.generateFont(parameter);
+        generator.dispose();
+        return font;
+    }
 
 
     /**
@@ -83,7 +84,7 @@ public class CampusChaos extends ApplicationAdapter {
         renderer.render();
 
 
-        Pair<Integer, Integer> coord = hoverSelectTile();
+        Pair<Integer, Integer> coord = tileSelect();
         String sectorName = null;
         if(map.sectorAtCoord(coord)) {
             sectorName = map.getSector(coord).name;
@@ -94,51 +95,8 @@ public class CampusChaos extends ApplicationAdapter {
             batch.end();
         }
 
-
-        shapeRenderer.begin(ShapeType.Filled);
-        shapeRenderer.setColor(0, 0, 0, 128);
-        shapeRenderer.rect(0, 0, 20, 20);
-        shapeRenderer.end();
 	}
 
-	// TODO Import sectors and locations from file
-    private Map initMap() {
-	    Map map = new Map();
-
-	    /*File sectorsFile = new File("core/assets/sectors.txt");
-	    String name;
-	    int x, y;
-	    int classID = 0;
-
-	    try {
-            Scanner inputStream = new Scanner(sectorsFile);
-            inputStream.useDelimiter(", ");
-
-            while(inputStream.hasNext()) {
-                name = inputStream.next();
-                x = Integer.parseInt(inputStream.next());
-                y = Integer.parseInt(inputStream.next());
-
-
-            }
-            inputStream.close();
-        }
-        catch (FileNotFoundException e) {
-	        e.printStackTrace();
-        }*/
-
-
-        Sector ronCookeHub = new Sector("Ron Cooke Hub");
-        Sector hesHall = new Sector("Heslington Hall");
-        Sector centralHall = new Sector("Central Hall");
-        Pair<Integer, Integer> ronCookeHubCoord = new Pair<Integer, Integer>(19,8);
-        Pair<Integer, Integer> hesHallCoord = new Pair<Integer, Integer>(9,7);
-        Pair<Integer, Integer> centralHallCoord = new Pair<Integer, Integer>(5,8);
-        map.addSector(ronCookeHubCoord, ronCookeHub);
-        map.addSector(hesHallCoord, hesHall);
-        map.addSector(centralHallCoord, centralHall);
-        return map;
-    }
 
     /**
      * Handles user input to move camera, ensures camera doesn't leave world
@@ -213,7 +171,7 @@ public class CampusChaos extends ApplicationAdapter {
     /**
      * Highlights tile that user is hovering over with the mouse
      */
-    private Pair<Integer, Integer> hoverSelectTile(){
+    private Pair<Integer, Integer> tileSelect(){
         TiledMapTileLayer mainLayer = (TiledMapTileLayer)tiledMap.getLayers().get(0);
 
         float mouseX = Gdx.input.getX();
@@ -252,25 +210,6 @@ public class CampusChaos extends ApplicationAdapter {
 
     }
 
-    /**
-     * Handles allocation of new gang members
-     */
-    // Will possibly take Player object as parameter
-    private int getWeights(String player) {
-        int weights = 0;
-        // TODO finish implementation of gang member allocation
-        return 0;
-    }
-
-    String currentPlayer = null;
-
-    private int getAllocation() {
-        int weights = getWeights(currentPlayer);
-        int bonus = 0; //Exists to allow for bonus feature later in development
-        int troops = Constants.BASE_TROOPS + (weights * Constants.SECTOR_SCALAR) + bonus;
-        return troops;
-    }
-
 
     /**
      * Handles camera update on resizing of game window
@@ -288,5 +227,7 @@ public class CampusChaos extends ApplicationAdapter {
 	public void dispose () {
         tiledMap.dispose();
         renderer.dispose();
+        batch.dispose();
+        font.dispose();
 	}
 }

@@ -33,7 +33,6 @@ public class CampusChaos extends ApplicationAdapter {
 
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer renderer;
-    private ShapeRenderer shapeRenderer;
 
     private Map map;
 
@@ -54,8 +53,18 @@ public class CampusChaos extends ApplicationAdapter {
         viewport = new ScreenViewport(cam);
         viewport.apply();
 
+        resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        Float[] displayedWH = getDisplayedWH();
+
+        float displayedMW = displayedWH[0];
+        float displayedMH = displayedWH[1];
+
         cam.position.set(cam.viewportWidth/2,cam.viewportHeight/2,0);
-        cam.zoom = 1.65f;
+
+        cam.zoom = (displayedMH<displayedMW?displayedMH:displayedMW);
+
+        //cam.zoom = 1.65f;
 
 	}
 
@@ -151,6 +160,22 @@ public class CampusChaos extends ApplicationAdapter {
         }
 
         // Edge clamping
+        Float[] displayedWH = getDisplayedWH();
+
+        float displayedMW = displayedWH[0];
+        float displayedMH = displayedWH[1];
+
+        cam.zoom = MathUtils.clamp(cam.zoom, 1f, (displayedMH<displayedMW?displayedMH:displayedMW));
+
+        float effectiveViewportWidth = cam.viewportWidth * cam.zoom;
+        float effectiveViewportHeight = cam.viewportHeight * cam.zoom;
+
+        cam.position.x = MathUtils.clamp(cam.position.x, effectiveViewportWidth / 2f, (displayedWH[2] - effectiveViewportWidth / 2f) - 1);
+        cam.position.y = MathUtils.clamp(cam.position.y, effectiveViewportHeight / 2f, (displayedWH[3] - effectiveViewportHeight / 2f) - 1);
+
+    }
+
+    private Float[] getDisplayedWH() {
         TiledMapTileLayer mainLayer = (TiledMapTileLayer)tiledMap.getLayers().get(0);
         float totalMapWidth = mainLayer.getWidth() * mainLayer.getTileWidth();
         float totalMapHeight = (mainLayer.getHeight() * mainLayer.getTileHeight()) - 128;
@@ -158,14 +183,7 @@ public class CampusChaos extends ApplicationAdapter {
         float displayedMH = totalMapHeight/cam.viewportHeight;
         float displayedMW = totalMapWidth/cam.viewportWidth;
 
-        cam.zoom = MathUtils.clamp(cam.zoom, 0.1f, (displayedMH<displayedMW?displayedMH:displayedMW));
-
-        float effectiveViewportWidth = cam.viewportWidth * cam.zoom;
-        float effectiveViewportHeight = cam.viewportHeight * cam.zoom;
-
-        cam.position.x = MathUtils.clamp(cam.position.x, effectiveViewportWidth / 2f, (totalMapWidth - effectiveViewportWidth / 2f) - 1);
-        cam.position.y = MathUtils.clamp(cam.position.y, effectiveViewportHeight / 2f, (totalMapHeight - effectiveViewportHeight / 2f) - 1);
-
+        return new Float[]{displayedMW, displayedMH, totalMapWidth, totalMapHeight};
     }
 
     /**

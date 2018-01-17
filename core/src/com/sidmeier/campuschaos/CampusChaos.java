@@ -55,14 +55,14 @@ public class CampusChaos extends ApplicationAdapter {
 
         resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        Float[] displayedWH = getDisplayedWH();
+        Float[] displayedWH = getDisplayValues();
 
         float displayedMW = displayedWH[0];
         float displayedMH = displayedWH[1];
 
         cam.position.set(cam.viewportWidth/2,cam.viewportHeight/2,0);
 
-        cam.zoom = (displayedMH<displayedMW?displayedMH:displayedMW);
+        cam.zoom = (displayedMH<displayedMW?displayedMH:displayedMW)  - 0.001f;
 
         //cam.zoom = 1.65f;
 
@@ -160,22 +160,25 @@ public class CampusChaos extends ApplicationAdapter {
         }
 
         // Edge clamping
-        Float[] displayedWH = getDisplayedWH();
+        Float[] displayValues = getDisplayValues();
 
-        float displayedMW = displayedWH[0];
-        float displayedMH = displayedWH[1];
+        float displayedMW = displayValues[0];
+        float displayedMH = displayValues[1];
 
         cam.zoom = MathUtils.clamp(cam.zoom, 1f, (displayedMH<displayedMW?displayedMH:displayedMW));
 
         float effectiveViewportWidth = cam.viewportWidth * cam.zoom;
         float effectiveViewportHeight = cam.viewportHeight * cam.zoom;
 
-        cam.position.x = MathUtils.clamp(cam.position.x, effectiveViewportWidth / 2f, (displayedWH[2] - effectiveViewportWidth / 2f) - 1);
-        cam.position.y = MathUtils.clamp(cam.position.y, effectiveViewportHeight / 2f, (displayedWH[3] - effectiveViewportHeight / 2f) - 1);
+        cam.position.x = MathUtils.clamp(cam.position.x, effectiveViewportWidth / 2f, (displayValues[2] - effectiveViewportWidth / 2f) - 1);
+        cam.position.y = MathUtils.clamp(cam.position.y, effectiveViewportHeight / 2f, (displayValues[3] - effectiveViewportHeight / 2f) - 1);
 
     }
 
-    private Float[] getDisplayedWH() {
+    /**
+     * Calculates display values for zoom calculations
+     */
+    private Float[] getDisplayValues() {
         TiledMapTileLayer mainLayer = (TiledMapTileLayer)tiledMap.getLayers().get(0);
         float totalMapWidth = mainLayer.getWidth() * mainLayer.getTileWidth();
         float totalMapHeight = (mainLayer.getHeight() * mainLayer.getTileHeight()) - 128;

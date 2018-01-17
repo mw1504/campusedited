@@ -200,7 +200,6 @@ public class CampusChaos extends ApplicationAdapter {
         float displayedMH = totalMapHeight/cam.viewportHeight;
         float displayedMW = totalMapWidth/cam.viewportWidth;
 
-        // TODO Limit zoom
         cam.zoom = MathUtils.clamp(cam.zoom, 0.1f, (displayedMH<displayedMW?displayedMH:displayedMW));
 
         float effectiveViewportWidth = cam.viewportWidth * cam.zoom;
@@ -251,6 +250,25 @@ public class CampusChaos extends ApplicationAdapter {
 
         return new Pair<Integer, Integer>(roundX, roundY);
 
+    }
+
+    /**
+     * Handles allocation of new gang members
+     */
+    // Will possibly take Player object as parameter
+    private int getWeights(String player) {
+        int weights = 0;
+        // TODO finish implementation of gang member allocation
+        return 0;
+    }
+
+    String currentPlayer = null;
+
+    private int getAllocation() {
+        int weights = getWeights(currentPlayer);
+        int bonus = 0; //Exists to allow for bonus feature later in development
+        int troops = Constants.BASE_TROOPS + (weights * Constants.SECTOR_SCALAR) + bonus;
+        return troops;
     }
 
 

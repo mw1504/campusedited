@@ -3,15 +3,15 @@ package com.sidmeier.campuschaos;
 public class Sector {
 
     String name;
-    // TODO Implement player class
     String affiliation;
     int amountOfUnits;
-    // TODO Implement bonus system
+    int bonus;
 
     public Sector(String name) {
         this.name = name;
         this.affiliation = null;
         this.amountOfUnits = 0;
+        this.bonus = 0;
     }
 
     public String getName() {

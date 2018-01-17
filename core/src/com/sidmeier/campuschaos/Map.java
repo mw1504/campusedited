@@ -1,6 +1,8 @@
 package com.sidmeier.campuschaos;
 
 import javafx.util.Pair;
+
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 
 public class Map {
@@ -22,6 +24,27 @@ public class Map {
         this.addSector(hesHallCoord, hesHall);
         this.addSector(centralHallCoord, centralHall);
     }
+
+/*    File sectorsFile = new File("core/assets/sectors.txt");
+    String name;
+    int x, y;
+
+	    try {
+        Scanner inputStream = new Scanner(sectorsFile);
+        inputStream.useDelimiter(", ");
+
+        while(inputStream.hasNext()) {
+            name = inputStream.next();
+            x = Integer.parseInt(inputStream.next());
+            y = Integer.parseInt(inputStream.next());
+
+
+        }
+        inputStream.close();
+    }
+        catch (FileNotFoundException e) {
+        e.printStackTrace();
+    }*/
 
     public HashMap<Pair<Integer, Integer>, Sector> getSectorMap() {
         return sectorLocations;

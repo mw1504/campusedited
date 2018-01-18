@@ -1,6 +1,20 @@
 package com.sidmeier.campuschaos.utils;
 
+import com.sidmeier.campuschaos.Map;
+import com.sidmeier.campuschaos.Sector;
+import javafx.util.Pair;
+
+import java.util.HashMap;
+
 public class UnitAllocation {
+
+    private Map map;
+    private String currentPlayer;
+
+    public UnitAllocation(Map map, String currentPlayer){
+        this.map = map;
+        this.currentPlayer = currentPlayer;
+    }
 
     /**
      * Handles allocation of new gang members
@@ -8,11 +22,15 @@ public class UnitAllocation {
     // Will possibly take Player object as parameter
     private int getWeights(String player) {
         int weights = 0;
-        // TODO finish implementation of gang member allocation
-        return 0;
+        HashMap<Pair<Integer, Integer>, Sector> sectorHashMap = map.getSectorLocations();
+        for(Pair<Integer, Integer> coord : sectorHashMap.keySet()) {
+            if(sectorHashMap.get(coord).getAffiliation() == currentPlayer) {
+                weights += sectorHashMap.get(coord).getBonus();
+            }
+        }
+        return weights;
     }
 
-    String currentPlayer = null;
 
     private int getAllocation() {
         int weights = getWeights(currentPlayer);

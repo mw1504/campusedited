@@ -102,6 +102,9 @@ public class CampusChaos extends ApplicationAdapter {
 
 	}
 
+    /**
+     * Imports font for use in app
+     */
 	private BitmapFont generateFont(String fontPath, int size) {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(fontPath));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -141,7 +144,7 @@ public class CampusChaos extends ApplicationAdapter {
         SectorInformation test = new SectorInformation(tileWidth,tileHeight,cam);
         test.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                
+
             }
         });
         stage = new Stage(viewport, new SpriteBatch());
@@ -224,11 +227,15 @@ public class CampusChaos extends ApplicationAdapter {
      */
     private Float[] getDisplayValues() {
         TiledMapTileLayer mainLayer = (TiledMapTileLayer)tiledMap.getLayers().get(0);
+
+        // Calculates total map dimensions
         float totalMapWidth = mainLayer.getWidth() * mainLayer.getTileWidth();
         float totalMapHeight = (mainLayer.getHeight() * mainLayer.getTileHeight()) - 128;
 
-        float displayedMH = totalMapHeight/cam.viewportHeight;
+        // ???
         float displayedMW = totalMapWidth/cam.viewportWidth;
+        float displayedMH = totalMapHeight/cam.viewportHeight;
+
 
         return new Float[]{displayedMW, displayedMH, totalMapWidth, totalMapHeight};
     }
@@ -239,28 +246,31 @@ public class CampusChaos extends ApplicationAdapter {
     private Pair<Integer, Integer> tileSelect(){
         TiledMapTileLayer mainLayer = (TiledMapTileLayer)tiledMap.getLayers().get(0);
 
+        // Gets mouse offsets from screen 'origin'
         float mouseX = Gdx.input.getX();
         float mouseY = -Gdx.input.getY() + (cam.viewportHeight);
 
+        // Gets camera offsets from map origin
         float camX = (cam.position.x - ((cam.viewportWidth/2) * cam.zoom)) * (1/cam.zoom);
         float camY = (cam.position.y - ((cam.viewportHeight/2) * cam.zoom)) * (1/cam.zoom);
 
+        // Gets tile dimensions
         this.tileWidth = mainLayer.getTileWidth() * (1/cam.zoom);
         this.tileHeight = mainLayer.getTileHeight() * (1/cam.zoom);
 
-        float tileX = (mouseX + camX)/tileWidth;
-        float tileY = (mouseY + camY)/tileHeight;
+        // Calculates tile coordinate (on map) that mouse is over
+        int tileX = (int) ((mouseX + camX)/tileWidth);
+        int tileY = (int) ((mouseY + camY)/tileHeight);
 
-        int roundX = (int) tileX;
-        int roundY = (int) tileY;
-
-        float selectX = (roundX * tileWidth) - camX;
-        float selectY = (roundY * tileWidth) - camY;
+        // Calculates viewport coordinates of bottom left of selected tile
+        float selectX = (tileX * tileWidth) - camX;
+        float selectY = (tileY * tileWidth) - camY;
 
         //System.out.println(roundX + ", " + roundY);
         //System.out.println((tileX - (tileX % 1)) + ", " + (tileY - (tileY % 1)));
 
-        Gdx.gl.glEnable(GL20.GL_BLEND);
+        // Renders outline and fill of tile highlight
+        Gdx.gl.glEnable(GL20.GL_BLEND);  // To allow opacity (alpha channel)
         ShapeRenderer shapeRenderer = new ShapeRenderer();
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(1, 0, 0, 1);
@@ -271,7 +281,7 @@ public class CampusChaos extends ApplicationAdapter {
         shapeRenderer.rect(selectX, selectY, tileWidth, tileHeight);
         shapeRenderer.end();
 
-        return new Pair<Integer, Integer>(roundX, roundY);
+        return new Pair<Integer, Integer>(tileX, tileY);
 
     }
 

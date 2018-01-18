@@ -29,8 +29,8 @@ public class ConflictResolution {
                 attackingUnits = attackingUnits - 1;
                 System.out.println("New amount of attacking units: " +attackingUnits);
                 if (attackingUnits == 0) {
-                    System.out.println("attack");
-                    return "attack";
+                    System.out.println("defend");
+                    return "defend";
                 }
             } else {
                 defendingUnits = defendingUnits - 1;

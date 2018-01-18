@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -12,6 +13,10 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.sidmeier.campuschaos.utils.Constants;
@@ -35,6 +40,35 @@ public class CampusChaos extends ApplicationAdapter {
     private OrthogonalTiledMapRenderer renderer;
 
     private Map map;
+    private Stage stage;
+
+    private float tileWidth;
+    private float tileHeight;
+
+    public class SectorInformation extends Actor {
+        private ShapeRenderer sectorInformationRenderer = new ShapeRenderer();
+        private float tileWidth;
+        private float tileHeight;
+        private OrthographicCamera cam;
+
+        public SectorInformation(float tileWidth, float tileHeight, OrthographicCamera cam) {
+            this.tileHeight = tileHeight;
+            this.tileWidth = tileWidth;
+            this.cam = cam;
+        }
+
+        @Override
+        public void draw(Batch batch, float alpha) {
+        sectorInformationRenderer.begin(ShapeRenderer.ShapeType.Line);
+        sectorInformationRenderer.setColor(0, 0, 1, 1);
+        sectorInformationRenderer.rect(this.cam.viewportWidth - 600, 20, 6* this.tileWidth, 4*tileHeight);
+        sectorInformationRenderer.end();
+        sectorInformationRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        sectorInformationRenderer.setColor(0, 0, 1, 0.5f);
+        sectorInformationRenderer.rect(this.cam.viewportWidth - 600, 20, 6* this.tileWidth, 4*tileHeight);
+        sectorInformationRenderer.end();
+        }
+    }
 
     /**
      * Defines map, renderer, camera and viewport
@@ -104,6 +138,16 @@ public class CampusChaos extends ApplicationAdapter {
             batch.end();
         }
 
+        SectorInformation test = new SectorInformation(tileWidth,tileHeight,cam);
+        test.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y) {
+                
+            }
+        });
+        stage = new Stage(viewport, new SpriteBatch());
+        stage.addActor(test);
+        Gdx.input.setInputProcessor(stage);
+        stage.draw();
 	}
 
 
@@ -201,8 +245,8 @@ public class CampusChaos extends ApplicationAdapter {
         float camX = (cam.position.x - ((cam.viewportWidth/2) * cam.zoom)) * (1/cam.zoom);
         float camY = (cam.position.y - ((cam.viewportHeight/2) * cam.zoom)) * (1/cam.zoom);
 
-        float tileWidth = mainLayer.getTileWidth() * (1/cam.zoom);
-        float tileHeight = mainLayer.getTileHeight() * (1/cam.zoom);
+        this.tileWidth = mainLayer.getTileWidth() * (1/cam.zoom);
+        this.tileHeight = mainLayer.getTileHeight() * (1/cam.zoom);
 
         float tileX = (mouseX + camX)/tileWidth;
         float tileY = (mouseY + camY)/tileHeight;
@@ -250,5 +294,6 @@ public class CampusChaos extends ApplicationAdapter {
         renderer.dispose();
         batch.dispose();
         font.dispose();
+        stage.dispose();
 	}
 }

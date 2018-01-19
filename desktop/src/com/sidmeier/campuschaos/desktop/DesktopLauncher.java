@@ -4,7 +4,6 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.sidmeier.campuschaos.CampusChaos;
 import com.sidmeier.campuschaos.utils.Constants;
-import com.sun.corba.se.impl.orbutil.closure.Constant;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {

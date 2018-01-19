@@ -96,4 +96,9 @@ public class Sector {
     public int getBonus() {
         return this.bonus;
     }
+
+    @Override
+    public String toString() {
+        return this.getName() + ", " + this.getAffiliation() + ", " + this.getAmountOfUnits() + ", " + this.getBonus();
+    }
 }

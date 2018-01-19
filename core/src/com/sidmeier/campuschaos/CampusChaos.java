@@ -51,35 +51,39 @@ public class CampusChaos extends ApplicationAdapter {
         private Sector selectedSector;
         private int timer = 0;
         private boolean draw = false;
+        private Pair<Float,Float> tileOrigin;
+        private SpriteBatch batch = new SpriteBatch();
 
-        public SectorInformation(float tileWidth, float tileHeight, OrthographicCamera cam, BitmapFont font) {
+        public SectorInformation(float tileWidth, float tileHeight, OrthographicCamera cam, BitmapFont font, Pair<Float,Float> tileOrigin, SpriteBatch batch) {
             this.tileHeight = tileHeight;
             this.tileWidth = tileWidth;
             this.cam = cam;
             this.font = font;
+            this.tileOrigin = tileOrigin;
+            //this.batch = batch;
         }
 
         @Override
         public void draw(Batch batch, float alpha) {
-        if (this.timer > 0) {
+
+        }
+
+        public void lemmiedraw(SpriteBatch batch) {
+            System.out.println(this.tileOrigin.getKey() + ", " + this.tileOrigin.getValue());
+            font.draw(batch, "Ass", 1000f, 274.23868f);
+            if (this.timer > 0) {
                 if (this.selectedSector.getName() != null) {
-                    font.draw(batch, this.selectedSector.getName(), this.cam.viewportWidth * 1.22f, 7.5f*this.tileHeight);
-                    System.out.println(11);
+                    font.draw(batch, this.selectedSector.getName(), this.tileOrigin.getKey(), this.tileOrigin.getValue());
                 } else {
-                    font.draw(batch, "test", this.cam.viewportWidth * 1.22f, 7.5f*this.tileHeight);
-                    System.out.println(12);
+                    font.draw(batch, "test", this.tileOrigin.getKey(), this.tileOrigin.getValue());
                 }
                 if (this.selectedSector.getAffiliation() != null) {
-                    font.draw(batch, this.selectedSector.getAffiliation(), this.cam.viewportWidth * 1.22f, 6f * this.tileHeight);
-                    System.out.println(21);
+                    font.draw(batch, this.selectedSector.getAffiliation(), this.tileOrigin.getKey(), this.tileOrigin.getValue());
                 } else {
-                    font.draw(batch, "test", this.cam.viewportWidth * 1.22f, 6f * this.tileHeight);
-                    System.out.println(22);
+                    font.draw(batch, "test", this.tileOrigin.getKey(), this.tileOrigin.getValue());
                 }
-                font.draw(batch,Integer.toString(this.selectedSector.getAmountOfUnits()),this.cam.viewportWidth * 1.22f,4.5f*this.tileHeight);
-                System.out.println(3);
-                font.draw(batch,Integer.toString(this.selectedSector.getBonus()),this.cam.viewportWidth * 1.22f,3f*this.tileHeight);
-                System.out.println(4);
+                font.draw(batch,Integer.toString(this.selectedSector.getAmountOfUnits()),this.tileOrigin.getKey(), this.tileOrigin.getValue());
+                font.draw(batch,Integer.toString(this.selectedSector.getBonus()),this.tileOrigin.getKey(), this.tileOrigin.getValue());
                 this.timer--;
                 if (this.timer == 0) {
                     this.draw = false;
@@ -106,8 +110,8 @@ public class CampusChaos extends ApplicationAdapter {
 	    map = new Map();
 
         batch = new SpriteBatch();
-        font = generateFont("core/assets/FreeMonoBold.ttf", 48);
 
+        font = generateFont("core/assets/FreeMonoBold.ttf", 48);
 	    tiledMap = new TmxMapLoader().load("core/assets/SEPRMapSquare.tmx");
 	    renderer = new OrthogonalTiledMapRenderer(tiledMap);
 
@@ -127,8 +131,9 @@ public class CampusChaos extends ApplicationAdapter {
         cam.zoom = (displayedMH<displayedMW?displayedMH:displayedMW)  - 0.001f;
 
         //cam.zoom = 1.65f;
+
         Pair<Float,Float> tileDimensions = this.getTileDimensions();
-        this.sectorDisplay = new SectorInformation(tileDimensions.getKey(),tileDimensions.getValue(),this.cam,this.font);
+        this.sectorDisplay = new SectorInformation(tileDimensions.getKey(),tileDimensions.getValue(),this.cam,this.font, this.getTileOrigin(new Pair<Integer,Integer>(18,1)), this.batch);
 	}
 
     /**
@@ -160,8 +165,9 @@ public class CampusChaos extends ApplicationAdapter {
 
         renderer.setView(cam);
         renderer.render();
-
-        Pair<Integer, Integer> coord = tileSelect();
+        //Draws Red Box.
+        this.redBox();
+        Pair<Integer, Integer> coord = this.getTileCoordinates();
 
         String sectorName = null;
         if(map.sectorAtCoord(coord)) {
@@ -169,11 +175,11 @@ public class CampusChaos extends ApplicationAdapter {
         }
         Pair<Float,Float> tileDimensions = this.getTileDimensions();
         batch.begin();
-        System.out.println(sectorName);
         if(sectorName != null){ //error here
-            System.out.println("here");
             font.draw(batch,sectorName,20,(cam.viewportHeight - 20));
         }
+        this.sectorDisplay.lemmiedraw(batch);
+        batch.end();
         /*this.stage.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -181,23 +187,26 @@ public class CampusChaos extends ApplicationAdapter {
                 tileClicked(x,y);
             }
         });*/
+        //font.draw(batch, "I made it", 2500, this.tileOrigin.getValue());
         if(Gdx.input.isTouched(0)){
             tileClicked(Gdx.input.getX(),(-Gdx.input.getY() + (cam.viewportHeight)));
         }
         if (this.sectorDisplay.isDraw()) {
+            Pair<Float,Float> tileOrigin = this.getTileOrigin(new Pair<Integer,Integer>(18,1));
+            System.out.println(tileOrigin.getKey() + ", " + tileOrigin.getValue());
+            Gdx.gl.glEnable(GL20.GL_BLEND);
             ShapeRenderer shaper = new ShapeRenderer();
             shaper.begin(ShapeRenderer.ShapeType.Line);
             shaper.setColor(0, 0, 1, 1);
-            shaper.rect((this.cam.viewportWidth + 10) - (7*tileDimensions.getKey()), tileDimensions.getValue(), 6* tileDimensions.getKey(), 4*tileDimensions.getValue());
+            shaper.rect(tileOrigin.getKey(), tileOrigin.getValue(), 6* tileDimensions.getKey(), 4*tileDimensions.getValue());
             shaper.end();
             shaper.begin(ShapeRenderer.ShapeType.Filled);
             shaper.setColor(0, 0, 1, 0.5f);
-            shaper.rect((this.cam.viewportWidth + 10) - (7*tileDimensions.getKey()), tileDimensions.getValue(), 6* tileDimensions.getKey(), 4*tileDimensions.getValue());
+            shaper.rect(tileOrigin.getKey(), tileOrigin.getValue(), 6* tileDimensions.getKey(), 4*tileDimensions.getValue());
             shaper.end();
         }
-        batch.end();
         stage.draw();
-	}
+    }
 
     /**
      * Handles user input to move camera, ensures camera doesn't leave world
@@ -279,16 +288,13 @@ public class CampusChaos extends ApplicationAdapter {
     }
 
     private void tileClicked(float x, float y) {
-        float camX = (cam.position.x - ((cam.viewportWidth/2) * cam.zoom)) * (1/cam.zoom);
-        float camY = (cam.position.y - ((cam.viewportHeight/2) * cam.zoom)) * (1/cam.zoom);
-
+        Pair<Float,Float> camOffset = this.getCameraOffset();
         Pair<Float,Float> tileDimensions = this.getTileDimensions();
+
         // Calculates tile coordinate (on map) that mouse is over
-        int tileX = (int) ((x + camX)/tileDimensions.getKey());
-        int tileY = (int) ((y + camY)/tileDimensions.getValue());
-        System.out.println("2." + (cam.position.x) + ", " + (cam.position.y) + ", " + tileX + ", " + tileY);
+        int tileX = (int) ((x + camOffset.getKey())/tileDimensions.getKey());
+        int tileY = (int) ((y + camOffset.getValue())/tileDimensions.getValue());
         Pair<Integer,Integer> coord = new Pair<Integer, Integer>(tileX, tileY);
-        System.out.println(this.map.getSector(coord));
         this.sectorDisplay.setSector(this.map.getSector(coord));
     }
 
@@ -312,24 +318,9 @@ public class CampusChaos extends ApplicationAdapter {
     /**
      * Highlights tile that user is hovering over with the mouse
      */
-    private Pair<Integer, Integer> tileSelect(){
-        // Gets mouse offsets from screen 'origin'
-        float mouseX = Gdx.input.getX();
-        float mouseY = -Gdx.input.getY() + (cam.viewportHeight);
-
-        // Gets camera offsets from map origin
-        float camX = (cam.position.x - ((cam.viewportWidth/2) * cam.zoom)) * (1/cam.zoom);
-        float camY = (cam.position.y - ((cam.viewportHeight/2) * cam.zoom)) * (1/cam.zoom);
-
+    private void redBox(){
         Pair<Float,Float> tileDimensions = this.getTileDimensions();
-        // Calculates tile coordinate (on map) that mouse is over
-        int tileX = (int) ((mouseX + camX)/tileDimensions.getKey());
-        int tileY = (int) ((mouseY + camY)/tileDimensions.getValue());
-        System.out.println("1." + tileX + ", " + tileY );
-        // Calculates viewport coordinates of bottom left of selected tile
-        float selectX = (tileX * tileDimensions.getKey()) - camX;
-        float selectY = (tileY * tileDimensions.getKey()) - camY;
-
+        Pair<Float,Float> tileOrigin = this.getTileOrigin(this.getTileCoordinates());
         //System.out.println(roundX + ", " + roundY);
         //System.out.println((tileX - (tileX % 1)) + ", " + (tileY - (tileY % 1)));
 
@@ -338,15 +329,38 @@ public class CampusChaos extends ApplicationAdapter {
         ShapeRenderer shapeRenderer = new ShapeRenderer();
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(1, 0, 0, 1);
-        shapeRenderer.rect(selectX, selectY, tileDimensions.getKey(), tileDimensions.getValue());
+        shapeRenderer.rect(tileOrigin.getKey(), tileOrigin.getValue(), tileDimensions.getKey(), tileDimensions.getValue());
         shapeRenderer.end();
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(1, 0, 0, 0.5f);
-        shapeRenderer.rect(selectX, selectY, tileDimensions.getKey(), tileDimensions.getValue());
+        shapeRenderer.rect(tileOrigin.getKey(), tileOrigin.getValue(), tileDimensions.getKey(), tileDimensions.getValue());
         shapeRenderer.end();
+    }
 
-        return new Pair<Integer, Integer>(tileX, tileY);
+    private void blueBox() {
 
+    }
+
+    private Pair<Integer,Integer> getTileCoordinates() {
+        // Gets mouse offsets from screen 'origin'
+        float mouseX = Gdx.input.getX();
+        float mouseY = -Gdx.input.getY() + (cam.viewportHeight);
+
+        // Gets camera offsets from map origin
+        Pair<Float,Float> camOffset = this.getCameraOffset();
+
+        Pair<Float,Float> tileDimensions = this.getTileDimensions();
+        // Calculates tile coordinate (on map) that mouse is over
+        int tileX = (int) ((mouseX + camOffset.getKey())/tileDimensions.getKey());
+        int tileY = (int) ((mouseY + camOffset.getValue())/tileDimensions.getValue());
+        // Calculates viewport coordinates of bottom left of selected tile
+
+        return new Pair<Integer,Integer>(tileX,tileY);
+    }
+
+    private Pair<Float,Float> getCameraOffset() {
+        return new Pair<Float,Float>((cam.position.x - ((cam.viewportWidth/2) * cam.zoom)) * (1/cam.zoom),
+                                        (cam.position.y - ((cam.viewportHeight/2) * cam.zoom)) * (1/cam.zoom));
     }
 
     private Pair<Float,Float> getTileDimensions() {
@@ -354,6 +368,14 @@ public class CampusChaos extends ApplicationAdapter {
         float tileWidth = mainLayer.getTileWidth() * (1/this.cam.zoom);
         float tileHeight = mainLayer.getTileHeight() * (1/this.cam.zoom);
         return new Pair<Float,Float>(tileWidth,tileHeight);
+    }
+
+    private Pair<Float,Float> getTileOrigin(Pair<Integer,Integer> tileCoord) {
+        Pair<Float,Float> camOffset = this.getCameraOffset();
+        Pair<Float,Float> tileDimensions = this.getTileDimensions();
+        float selectX = (tileCoord.getKey() * tileDimensions.getKey()) - camOffset.getKey();
+        float selectY = (tileCoord.getValue() * tileDimensions.getKey()) - camOffset.getValue();
+        return new Pair<Float,Float> (selectX,selectY);
     }
 
     /**
